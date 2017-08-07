@@ -10,7 +10,6 @@ logging.basicConfig( format='%(asctime)s - %(name)s - %(levelname)s - %(message)
 
 logger = logging.getLogger( __name__ )
 
-BOTTOKEN = "443715470:AAGrVdtvNMV0SeHRjibTdgPHYLPwUfiNwno"
 REGDIR = "/opt/icingateller/registry/"
 PASSWORD = "HBMsU"
 ICINGAALERTS = "/opt/icingateller/alerts/"
@@ -44,8 +43,7 @@ def start( bot, update ):
 	if not RegisteredUser:
 		update.message.reply_text( "Hi " +
 			update.effective_user.first_name + " " + update.effective_user.last_name + "\n" +
-			"This is the HBMSU Monitoring Bot for receiving monitoring alerts.\n\n" +
-			"Please enter passphrase for verfication" )
+			"This is the HBMSU Monitoring Bot for receiving monitoring alerts.\n\n" )
 	else:
 		update.message.reply_text(	"Welcome back " + RegisteredUser['first_name'] + " " + RegisteredUser['last_name'] +
 						"\n\nEnter /channels to select your alerting channels" )
@@ -125,12 +123,22 @@ def error(bot, update, error):
 	logger.warn('Update "%s" caused error "%s"' % (update, error))
 
 def main():
+	with open( 'TOKEN', 'r' ) as f:
+		BOTTOKEN = f.read().splitlines()[0]
 	updater = Updater( BOTTOKEN )
 	jq = updater.job_queue
 	dp = updater.dispatcher
 
 	# CommandHandlers
 	dp.add_handler( CommandHandler("start",	start ) )
+	dp.add_handler( CommandHandler("register", register ) )
+	dp.add_handler( CommandHandler("auth", auth ) )
+	dp.add_handler( CommandHandler("web", web ) )
+	dp.add_handler( CommandHandler("status", status ) )
+	dp.add_handler( CommandHandler("graph", status ) )
+	dp.add_handler( CommandHandler("ack", ack ) )
+	dp.add_handler( CommandHandler("downtime", down ) )
+	dp.add_handler( CommandHandler("report", report ) )
 	dp.add_handler( CommandHandler("channels", channels) )
 	dp.add_handler( CommandHandler("help", help) )
 
@@ -138,7 +146,7 @@ def main():
 	dp.add_handler( CallbackQueryHandler( toggleChannel ) )
 
 	# MessageHandlers
-	dp.add_handler(MessageHandler(Filters.text, message, pass_job_queue=True ) )
+	dp.add_handler(MessageHandler(Filters.text, message ) )
 
 	# ErrorHandler
 	dp.add_error_handler(error)
