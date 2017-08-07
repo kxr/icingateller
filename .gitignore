@@ -3,3 +3,4 @@ registry/*
 alerts/*
 *.log
 TOKEN
+ad.py
