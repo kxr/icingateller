@@ -2,5 +2,4 @@ __pycache__
 registry/*
 alerts/*
 *.log
-TOKEN
-ad.py
+secrets.py
